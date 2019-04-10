@@ -123,6 +123,7 @@ class SplitterTrainer(object):
         Creating an EgoNetSplitter.
         """
         self.egonet_splitter = EgoNetSplitter(self.graph)
+        self.egonet_nodes = self.egonet_splitter.persona_graph.nodes()
         self.persona_walker = DeepWalker(self.egonet_splitter.persona_graph, self.args)
         # print("\nDoing persona random walks.\n")
         # self.persona_walker.create_features()
@@ -157,10 +158,9 @@ class SplitterTrainer(object):
         self.pure_sources.append(source_node)
         self.personas.append(self.egonet_splitter.personality_map[source_node])
         self.sources.extend([source_node]*(self.args.negative_samples+1))
-        nodes = self.egonet_splitter.persona_graph.nodes()
         self.contexts.append(context_node)
         self.targets.append(1.0)
-        self.contexts.extend(random.choices(nodes, k=self.args.negative_samples))
+        self.contexts.extend(random.choices(self.egonet_nodes, k=self.args.negative_samples))
         self.targets.extend([0.0] * self.args.negative_samples)
 
     def transfer_batch(self):
