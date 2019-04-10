@@ -154,11 +154,14 @@ class SplitterTrainer(object):
         :param source_node: A source node.
         :param context_node: A target to predict.
         """
-        self.pure_sources = self.pure_sources + [source_node]
-        self.personas = self.personas + [self.egonet_splitter.personality_map[source_node]]
-        self.sources  = self.sources + [source_node]*(self.args.negative_samples+1)
-        self.contexts = self.contexts + [context_node] + random.sample(self.egonet_splitter.persona_graph.nodes(),self.args.negative_samples)
-        self.targets = self.targets + [1.0] + [0.0]*self.args.negative_samples
+        self.pure_sources.append(source_node)
+        self.personas.append(self.egonet_splitter.personality_map[source_node])
+        self.sources.extend([source_node]*(self.args.negative_samples+1))
+        nodes = self.egonet_splitter.persona_graph.nodes()
+        self.contexts.append(context_node)
+        self.targets.append(1.0)
+        self.contexts.extend(random.choices(nodes, k=self.args.negative_samples))
+        self.targets.extend([0.0] * self.args.negative_samples)
 
     def transfer_batch(self):
         """
