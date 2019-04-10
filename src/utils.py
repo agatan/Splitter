@@ -9,7 +9,7 @@ def tab_printer(args):
     """
     args = vars(args)
     keys = sorted(args.keys())
-    t = Texttable() 
+    t = Texttable()
     t.add_rows([["Parameter", "Value"]] +  [[k.replace("_"," ").capitalize(),args[k]] for k in keys])
     print(t.draw())
 
@@ -21,4 +21,7 @@ def graph_reader(path):
     """
     graph = nx.from_edgelist(pd.read_csv(path).values.tolist())
     graph.remove_edges_from(graph.selfloop_edges())
+    isolated = nx.isolates(graph)
+    print("Remove {} isolated nodes...".format(len(isolated)))
+    graph.remove_nodes_from(isolated)
     return graph

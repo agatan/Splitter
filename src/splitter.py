@@ -1,5 +1,5 @@
 import json
-import torch 
+import torch
 import random
 import numpy as np
 import pandas as pd
@@ -91,7 +91,7 @@ class Splitter(torch.nn.Module):
          regularization_loss = self.calculate_regularization(pure_sources, personas)
          loss = main_loss + self.args.lambd*regularization_loss
          return loss
-         
+
 class SplitterTrainer(object):
     """
     Class for training a Splitter.
@@ -117,14 +117,15 @@ class SplitterTrainer(object):
         print("\nDeleting the base walker.\n")
         del self.base_walker
 
+
     def create_split(self):
         """
         Creating an EgoNetSplitter.
         """
         self.egonet_splitter = EgoNetSplitter(self.graph)
         self.persona_walker = DeepWalker(self.egonet_splitter.persona_graph, self.args)
-        print("\nDoing persona random walks.\n")
-        self.persona_walker.create_features()
+        # print("\nDoing persona random walks.\n")
+        # self.persona_walker.create_features()
 
     def setup_model(self):
         """
@@ -145,7 +146,7 @@ class SplitterTrainer(object):
         self.personas = []
         self.sources = []
         self.contexts = []
-        self.targets = [] 
+        self.targets = []
 
     def create_batch(self, source_node, context_node):
         """
@@ -192,15 +193,16 @@ class SplitterTrainer(object):
         self.optimizer = torch.optim.Adam(self.model.parameters(), lr=self.args.learning_rate)
         self.optimizer.zero_grad()
         print("\nLearning the joint model.\n")
-        random.shuffle(self.persona_walker.paths)
+        # random.shuffle(self.persona_walker.paths)
         self.steps = 0
         self.losses = 0
-        self.walk_steps = trange(len(self.persona_walker.paths), desc="Loss")
+        self.walk_steps = trange(len(self.persona_walker.graph.nodes()) * self.args.number_of_walks, desc="Loss")
+        generator = self.persona_walker.generator()
         for step in self.walk_steps:
             if step % 1000 ==0:
                 self.steps = 0
                 self.losses = 0
-            walk = self.persona_walker.paths[step]
+            walk = next(generator)
 
             for i in range(self.args.walk_length-self.args.window_size):
                 for j in range(1,self.args.window_size+1):
@@ -235,4 +237,4 @@ class SplitterTrainer(object):
         Saving the persona map.
         """
         with open(self.args.persona_output_path, "w") as f:
-           json.dump(self.egonet_splitter.personality_map, f)                     
+           json.dump(self.egonet_splitter.personality_map, f)

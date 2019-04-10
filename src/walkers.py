@@ -1,8 +1,10 @@
+import functools
 import random
 import numpy as np
 from tqdm import tqdm
 import networkx as nx
 from gensim.models import Word2Vec
+
 
 class DeepWalker(object):
     """
@@ -26,8 +28,8 @@ class DeepWalker(object):
         :return walk: Truncated random walk with fixed maximal length.
         """
         walk = [start_node]
-        current = start_node
-        while len(walk) < self.args.walk_length:
+        for _ in range(self.args.walk_length):
+            current = walk[-1]
             neighbors = nx.neighbors(self.graph, current)
             n = len(neighbors)
             if n == 0:
@@ -35,6 +37,20 @@ class DeepWalker(object):
             choice = neighbors[random.randint(0, n - 1)]
             walk.append(choice)
         return walk
+
+    def generator(self):
+        buffer = []
+        for node in self.graph.nodes():
+            for k in range(self.args.number_of_walks):
+                walk = self.small_walk(node)
+                buffer.append(walk)
+                if len(buffer) == 10000:
+                    random.shuffle(buffer)
+                    for b in buffer:
+                        yield b
+                    buffer = []
+        for b in buffer:
+            yield b
 
     def create_features(self):
         """

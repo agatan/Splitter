@@ -3,7 +3,7 @@ from tqdm import tqdm
 
 class EgoNetSplitter(object):
     """
-    A lightweight implementation of "Ego-Splitting Framework: from Non-Overlapping to Overlapping Clusters". 
+    A lightweight implementation of "Ego-Splitting Framework: from Non-Overlapping to Overlapping Clusters".
     Paper: https://www.eecs.yorku.ca/course_archive/2017-18/F/6412/reading/kdd17p145.pdf
     Video: https://www.youtube.com/watch?v=xMGZo-F_jss
     Slides: https://epasto.org/papers/kdd2017-Slides.pdf
@@ -30,7 +30,7 @@ class EgoNetSplitter(object):
         for k, v in components.items():
             personalities.append(self.index)
             for other_node in v:
-                new_mapping[other_node] = self.index 
+                new_mapping[other_node] = self.index
             self.index = self.index +1
         self.components[node] = new_mapping
         self.personalities[node] = personalities
