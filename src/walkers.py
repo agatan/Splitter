@@ -32,7 +32,7 @@ class DeepWalker(object):
             n = len(neighbors)
             if n == 0:
                 break
-            choice = neighbors[random.randint(0, n)]
+            choice = neighbors[random.randint(0, n - 1)]
             walk.append(choice)
         return walk
 
