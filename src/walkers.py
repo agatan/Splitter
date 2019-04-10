@@ -18,7 +18,7 @@ class DeepWalker(object):
         """
         self.graph = graph
         self.args = args
-        
+
     def small_walk(self, start_node):
         """
         Doing a truncated random walk.
@@ -26,10 +26,14 @@ class DeepWalker(object):
         :return walk: Truncated random walk with fixed maximal length.
         """
         walk = [start_node]
+        current = start_node
         while len(walk) < self.args.walk_length:
-            if len(nx.neighbors(self.graph,walk[-1])) ==0:
+            neighbors = nx.neighbors(self.graph, current)
+            n = len(neighbors)
+            if n == 0:
                 break
-            walk = walk + [random.sample(nx.neighbors(self.graph,walk[-1]),1)[0]]
+            choice = neighbors[random.randint(0, n)]
+            walk.append(choice)
         return walk
 
     def create_features(self):
